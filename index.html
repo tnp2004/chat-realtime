@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3"
+      crossorigin="anonymous"
+    />
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+      crossorigin="anonymous"
+    ></script>
+    <title>chat realtime</title>
+  </head>
+  <body>
+    <div class=" container-sm">
+      <div class="card mt-5 text-light" style="background-color: #343a40;">
+        <div class="card-header">Chat Realtime <span id="typing"></span><span style="position: absolute; right: 2%; color: #20c997;" id="usercounter"></span></div>
+        <div class="card-body">
+          <blockquote class="blockquote mb-0">
+            <ul id="box" style="list-style: none;"></ul>
+            <form class="d-flex" id="form">
+              <input
+                type="text"
+                class="form-control rounded-start mx-1"
+                placeholder="type something..."
+                id="input"
+                autocomplete="off"
+              />
+              <button type="submit" class="btn btn-success rounded-end">Send</button>
+            </form>
+          </blockquote>
+        </div>
+      </div>
+    </div>
+  </body>
+
+  <script src="socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    const form = document.getElementById("form");
+    const input = document.getElementById("input");
+    const userId = Date.now();
+
+    socket.emit("newuser", `user${userId}`);
+     // users count
+     socket.on('usercount', data => {
+        const usercount = document.getElementById('usercounter')
+        usercount.textContent = `${data} users are connecting now`;
+    })
+
+    form.addEventListener("submit", e => {
+      e.preventDefault();
+      if (input.value) {
+        socket.emit('chat message', {
+          username: `user${userId}`,
+          msg: input.value
+        });
+        input.value = "";
+      }
+    });
+
+    socket.on('chat message', (data) => {
+      const box = document.getElementById("box");
+      const li = document.createElement("li");
+      const p = document.createElement("p");
+      const span = document.createElement("span");
+      const { username, msg, color } = data;
+      p.textContent = `${username}: ${msg}`;
+      p.style.color = color
+
+      li.appendChild(p);
+      box.appendChild(li);
+    });
+
+    input.addEventListener('keypress', e => {
+        socket.emit('typing', `user${userId}`)
+    })
+
+    socket.on('typing', data => { 
+        const typing = document.getElementById("typing");
+        typing.style.color = data.color;
+        typing.textContent = data.username + " is typing..."
+        setTimeout(() => { typing.textContent = ''}, 2000)
+    })
+  </script>
+</html>

@@ -15,14 +15,17 @@
       integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
       crossorigin="anonymous"
     ></script>
+    <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
+    <script src="https://kit.fontawesome.com/1f3965e820.js" crossorigin="anonymous"></script>
     <title>chat realtime</title>
   </head>
   <body>
-    <div class=" container-sm">
-      <div class="card mt-5 text-light" style="background-color: #343a40;">
-        <div class="card-header">Chat Realtime <span id="typing"></span><span style="position: absolute; right: 2%; color: #20c997;" id="usercounter"></span></div>
+    <div class=" container my-5">
+      <div class="card mt-5 text-light font-monospace" style="background-color: #343a40;">
+        <div class="card-header blockquote d-flex flex-lg-row flex-sm-column justify-content-between"><span class="w-50 mx-1" id="title"></span><span class="w-50 text-end" style=" color: #20c997;" id="usercounter"></span></div>
         <div class="card-body">
           <blockquote class="blockquote mb-0">
+            <span id="typing"></span>
             <ul id="box" style="list-style: none;"></ul>
             <form class="d-flex" id="form">
               <input
@@ -32,7 +35,7 @@
                 id="input"
                 autocomplete="off"
               />
-              <button type="submit" class="btn btn-success rounded-end">Send</button>
+              <button type="submit" class="btn btn-warning rounded-end">Send</button>
             </form>
           </blockquote>
         </div>
@@ -73,6 +76,9 @@
       const { username, msg, color } = data;
       p.textContent = `${username}: ${msg}`;
       p.style.color = color
+      if(`user${userId}` == username) {
+        p.innerHTML = `<i class="fa-solid fa-caret-right"></i> ${username}: ${msg}`;
+      }
 
       li.appendChild(p);
       box.appendChild(li);
@@ -86,7 +92,19 @@
         const typing = document.getElementById("typing");
         typing.style.color = data.color;
         typing.textContent = data.username + " is typing..."
-        setTimeout(() => { typing.textContent = ''}, 2000)
+        setTimeout(() => { typing.textContent = ''}, 3000)
     })
+
+    // decorate title
+    const title = document.getElementById("title");
+    const icon = '<i class="fa-solid fa-circle-notch my-1 mx-1"></i>';
+    var typed = new Typed('#title', {
+    strings: [`${icon}Chat Realtime`, `${icon}Join new tab localhost for chatting!!`],
+    smartBackspace: true,
+    typeSpeed: 100,
+    backSpeed: 50,
+    loop: true,
+    showCursor: false,
+});
   </script>
 </html>

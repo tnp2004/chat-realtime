@@ -4,6 +4,7 @@ const io = require('socket.io')(http);
 const pastelColor = require("pastel-color");
 const randomstring = require("randomstring");
 let userCount = 0;
+const fs = require('fs');
 
 app.get('/', (req, res) => {
     res.sendFile(__dirname + '/index.html')
@@ -25,6 +26,12 @@ io.on('connection', socket => {
 
     socket.on('chat message', data => {
         console.log(data)
+        // logdata
+        const { username, msg } = data;
+        const logdata = `${Date()} | ${username}: ${msg} \n`
+        fs.writeFileSync('chatlog.txt', logdata, { flag: 'a+'})
+
+        // send data to every client
         io.emit('chat message', {
             username: data.username,
             msg: data.msg,
